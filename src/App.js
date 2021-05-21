@@ -9,6 +9,11 @@ import { usePreventLeave } from "./Hooks/usePreventLeave";
 import { useBeforeLeave } from "./Hooks/useBeforeLeave";
 import { useFadeIn } from "./Hooks/useFadeIn";
 import { useNetwork } from "./Hooks/useNetwork";
+import { useScroll } from "./Hooks/useScroll";
+import { useFullScreen } from "./Hooks/useFullScreen";
+import { useNotification } from "./Hooks/useNotification";
+import { useAxios } from "./Hooks/useAxios";
+import axios from "axios";
 
 const content = [
   {
@@ -49,6 +54,17 @@ function App() {
   const fadeInElement2 = useFadeIn(5, 3);
 
   const onLine = useNetwork();
+  const { y } = useScroll();
+
+  const imageRef = useFullScreen();
+
+  const notification = useNotification("Request Notification");
+
+  const { loading, data, error, refetch } = useAxios({
+    url: "cors-anywhere.herokuapp.com/https://yts.am/api/v2/list_movies.json",
+  });
+  console.log(`loading: ${loading}\nData: ${data}\nError: ${error}`);
+
   return (
     <>
       <div>
@@ -85,6 +101,29 @@ function App() {
         useFadeIn 2
       </div>
       <div className="useNetwork">{onLine ? "Online" : "Offline"}</div>
+      <div
+        className="useScroll"
+        style={{ height: "100vh", color: y > 100 ? "yellow" : "green" }}
+      >
+        MouseScroll
+      </div>
+      <div className="useFullScreen">
+        <img
+          ref={imageRef.element}
+          src="https://images.unsplash.com/photo-1567722066597-2bdf36d13481?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MXwxMTI4NzN8MHwxfGNvbGxlY3Rpb258OTkzfDE1NDg1MXx8fHx8Mnw&ixlib=rb-1.2.1&q=80&w=400"
+        />
+        <button onClick={imageRef.triggerFull}>Image Full</button>
+        <button onClick={imageRef.exitFull}>exit Fullscreen</button>
+      </div>
+      <div className="useNotification">
+        <button onClick={notification}>Notification</button>
+      </div>
+      <div className="useAxios">
+        <h1>{data && data.status}</h1>
+        <h2>{loading && "Loading"}</h2>
+        <h2>{error && "Error"}</h2>
+        <button onClick={refetch}>Refetch</button>
+      </div>
     </>
   );
 }
